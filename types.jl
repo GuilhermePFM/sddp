@@ -9,4 +9,9 @@ struct States
     States(nStages::Int) = new(zeros(nStages))
 end
 
+struct Inflows
+    forward::Array{Array{Float64,1},1}
+    backward::Array{Array{Float64,1},1}
+end
+
 @enum Phase FORWARD=1 BACKWARD=2 SIMULATION=3

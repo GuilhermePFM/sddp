@@ -137,9 +137,9 @@ end
 
 function sddp()
     tolerance = 0.05
-    nStages = 3
-    nForwards = 2
-    nBackwards = 1
+    nStages = 3  # sempre um a mais
+    nForwards = 3
+    nBackwards = 3
     prb = Problem(nStages, nBackwards, nForwards)
     
     # states begin at stage 2, to avoid 0 index error
@@ -148,8 +148,9 @@ function sddp()
     states.v[1] = 50
 
     # a_matrix = [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], [1.0, 2.0, 3.0], [3.0, 3.0, 3.0]]
-    a_matrix::Array{Array{Float64,1},1}
-    a_matrix = [[0.0, 0.0], [100, 100], [0, 0]]
+    inf_forward = [[0.0, 0.0, 0.0], [90, 100, 110], [10, 0, 0]]
+    inf_backward = [[0.0, 0.0, 0.0], [50, 100, 150], [100, 50, 0]]
+    inflw = Inflows(inf_forward, inf_backward)
     
     # FCF considers the FCF from last stage + 1
     nFCF = (prb.nStages + 1)
@@ -157,8 +158,8 @@ function sddp()
     
     max_it = 10
     for i in 1:max_it
-        Csup, σ2 = forward!(prb, states, FCF, a_matrix)
-        Cinf = backward!(prb, states, FCF, a_matrix)
+        Csup, σ2 = forward!(prb, states, FCF, inflw.forward)
+        Cinf = backward!(prb, states, FCF, inflw.backward)
 
         # build confidence 95% interval
         # IC_ub = Csup + Z * sqrt(σ2 / prb.nForwards)
@@ -176,5 +177,5 @@ function sddp()
     end
 
     # simulate 
-    simulation!(prb, states, FCF, a_matrix)
+    simulation!(prb, states, FCF, inflw.forward)
 end
