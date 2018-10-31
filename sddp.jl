@@ -49,7 +49,8 @@ function subproblem(states::States, FCF, a::Float64, t::Int, phase::Phase)
         states.v[t] = getvalue(v)
     end
 
-    return getobjectivevalue(m)
+    ICF = 100*getvalue(g[1]) + 1000*getvalue(g[2]) + 100000 * getvalue(deficit)
+    return ICF
 end
 
 function add_cuts!(m::JuMP.Model, FCF, t::Int)
@@ -179,3 +180,5 @@ function sddp()
     # simulate 
     simulation!(prb, states, FCF, inflw.forward)
 end
+
+sddp()
